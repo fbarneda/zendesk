@@ -6,7 +6,7 @@ import os
 
 '''
 Please edit "subdomain" with your subdomain
-Please edit "username" with your username. Do not remove '/token'
+Please edit "username" with your Zendesk email address. Do not remove '/token'
 Please edit "token" with a valid token from Admin > API > Token Access
 '''
 subdomain = 'xxxxxx'
