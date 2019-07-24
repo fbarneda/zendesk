@@ -69,7 +69,6 @@ while url:
         print("HTTP 429 received. Waiting to retry again.")
         time_to_wait = int(r.headers['Retry-After'])
         time.sleep(time_to_wait)
-        page -= 1
         continue
 
 # HTTP 500 range
