@@ -21,17 +21,17 @@ def letsWait(wait_seconds):
         time.sleep(1)
 
 
-subdomain = 'xxxx'
-user = 'xxxxx@xxxx.xxx/token'
-token = 'xxxxxxxx'
-file_name = 'tickets.json'
+subdomain = 'XXXXX'
+user = 'XXXX@XXX.XXX/token'
+token = 'XXXXX'
+file_name = 'agents.csv'
 
-url = 'https://' + subdomain + '.zendesk.com/api/v2/tickets'
+url = 'https://' + subdomain + '.zendesk.com/api/v2/users.json?role[]=agent&role[]=admin'
 print('\n>>> EXPORTING from: ',url,'\n')
 
-# Create file, open it and add a text needed to have a valid JSON file
+# Create file
 my_file = open(file_name, 'w+')
-my_file.write('{"tickets":[' + '\n')
+my_file.write('"ID","NAME","EMAIL","ROLE","CREATED_AT","UPDATED_AT"\n')
 
 page = 0
 
@@ -48,9 +48,16 @@ while url:
 
         json_data = r.json()
 
-        for ticket in json_data['tickets']:
+        for user in json_data['users']:
 
-            my_file.write('{"ticket": ' + json.dumps(ticket) + "},\n")  # This structure will create a valid JSON file
+            print(json.dumps(user))
+
+            my_file.write(json.dumps(user['id']) + ", ")
+            my_file.write(json.dumps(user['name']) + ", ")
+            my_file.write(json.dumps(user['email']) + ", ")
+            my_file.write(json.dumps(user['role']) + ", ")
+            my_file.write(json.dumps(user['created_at']) + ", ")
+            my_file.write(json.dumps(user['updated_at']) + "\n")
 
         url = json_data['next_page']
 
@@ -99,21 +106,13 @@ while url:
         print(f"\n** CONTENT **\n {r.content}")
         break
 
+
     else:
-        print("Looping back again. Something went wrong")
+
+        print("Something went wrong, please review the information entered.")
 
 
 # Closing the file we are working on
 my_file.close()
-
-# read the file into a list of lines
-my_file = open(file_name, 'r').readlines()
-
-# remove the ',' at the end of the last line and add a text to the end to make it a valid JSON
-new_last_line = (my_file[-1][:-2] + "\n]}")
-my_file[-1] = new_last_line
-
-#  write the modified last line back to the file
-open(file_name, 'w').writelines(my_file)
 
 print("\n>>> DONE - Export Finished OK")
