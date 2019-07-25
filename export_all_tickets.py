@@ -17,7 +17,7 @@ def letsWait(wait_seconds):
 
     for num in count_down:
 
-        print(num + " seconds left")
+        print(str(num) + " seconds left")
         time.sleep(1)
 
 
