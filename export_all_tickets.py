@@ -1,27 +1,39 @@
-import requests
-import json
-import os
-import time
+"""
+* Please edit "subdomain" with your subdomain
+
+* Please edit "username" with your Zendesk email address. Do not remove '/token'
+
+* Please edit "token" with a valid token from Admin > API > Token Access
+
+"""
+
+import requests, json, time
 
 
-'''
-Please edit "subdomain" with your subdomain
-Please edit "username" with your Zendesk email address. Do not remove '/token'
-Please edit "token" with a valid token from Admin > API > Token Access
-'''
+def letsWait(wait_seconds):
+
+    count_down = list(range(1,wait_seconds+1))
+    count_down.reverse()
+
+    for num in count_down:
+
+        print(num + " seconds left")
+        time.sleep(1)
+
 
 subdomain = 'xxxx'
-user = 'xxxx/token'
-token = 'xxxxxx'
+user = 'xxxxx@xxxx.xxx/token'
+token = 'xxxxxxxx'
+file_name = 'tickets.json'
 
 url = 'https://' + subdomain + '.zendesk.com/api/v2/tickets'
-print('>>> Accessing',url,'\n')
+print('\n>>> EXPORTING from: ',url,'\n')
 
-if os.path.exists('agents.csv'):
-  os.remove('agents.csv')
+# Create file, open it and add a text needed to have a valid JSON file
+my_file = open(file_name, 'w+')
+my_file.write('{"tickets":[' + '\n')
 
 page = 0
-print("Entering loop now")
 
 while url:
 
@@ -32,20 +44,16 @@ while url:
 
         page += 1
 
-        print('Working on page number', page)
+        print("Working on page number " + str(page))
 
         json_data = r.json()
 
-        my_file = open('agents.csv', 'a')
-
         for ticket in json_data['tickets']:
 
-            my_file.write(json.dumps(ticket))
-            my_file.write('\n')
-
-        my_file.close()
+            my_file.write('{"ticket": ' + json.dumps(ticket) + "},\n")  # This structure will create a valid JSON file
 
         url = json_data['next_page']
+
 
 # HTTP 400 Range
     elif str(r.status_code) == '403':
@@ -63,13 +71,25 @@ while url:
         print("HTTP 422 received. A 422 response means that the content type and the syntax of the request entity are correct, but the content itself is not processable by the server. This is usually due to the request entity not being relevant to the resource that it's trying to create or update. Example: Trying to close a ticket that's already closed.")
         break
 
+
 # HTTP 429
     elif str(r.status_code) == '429':
 
         print("HTTP 429 received. Waiting to retry again.")
-        time_to_wait = int(r.headers['Retry-After'])
-        time.sleep(time_to_wait)
-        continue
+
+        try:
+
+            time_to_wait = int(r.headers['Retry-After'])
+            print("Received a 'Retry-After' of " + str(time_to_wait) + " seconds.")
+            letsWait(time_to_wait)
+            continue
+
+        except:
+
+            print("I could not see a header 'Retry-After'. Let's wait 1 min.")
+            letsWait(60)
+            continue
+
 
 # HTTP 500 range
     elif str(r.status_code)[0] == '5':
@@ -80,4 +100,20 @@ while url:
         break
 
     else:
-        print("Looping back again.")
+        print("Looping back again. Something went wrong")
+
+
+# Closing the file we are working on
+my_file.close()
+
+# read the file into a list of lines
+my_file = open(file_name, 'r').readlines()
+
+# remove the ',' at the end of the last line and add a text to the end to make it a valid JSON
+new_last_line = (my_file[-1][:-2] + "\n]}")
+my_file[-1] = new_last_line
+
+#  write the modified last line back to the file
+open(file_name, 'w').writelines(my_file)
+
+print("\n>>> DONE - Export Finished OK")
