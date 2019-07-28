@@ -2,9 +2,10 @@
 * Please edit "subdomain" with your subdomain
 * Please edit "username" with your Zendesk email address. Do not remove '/token'
 * Please edit "token" with a valid token from Admin > API > Token Access
+* Please edit "tag" with the tag you like
 """
 
-import requests, json, time, math
+import requests, json, time, urllib.parse, math
 
 
 def reportDetails(r,page,num_tickets_to_export):
@@ -23,23 +24,28 @@ def letsWait(wait_seconds):
 
 
 subdomain = 'xxxxx'
-user = ' xxxxxx@xxx.xxx/token'
-token = 'xxxxxxxxxxx'
-file_name = 'tickets.json'
+user = 'xxxxx@xxx.xxx/token'
+token = 'xxxxxxxxx'
+tag = 'xxxx'
+
+
+search = 'type:ticket tags:' + tag
+file_name = 'tickets_with_tag_'+tag+'.json'
 
 # If you’re making several requests to the same host, the underlying TCP connection will be reused,
 # which can result in a significant performance increase
 session = requests.Session()
 
-# We will be using the Tickets end-point
-# For more info: https://developer.zendesk.com/rest_api/docs/support/tickets#list-tickets
-url = 'https://' + subdomain + '.zendesk.com/api/v2/tickets.json'
+# We will be using the Search end-point
+# # For more info: https://developer.zendesk.com/rest_api/docs/support/search
+url = 'https://' + subdomain + '.zendesk.com/api/v2/search.json?query=' + urllib.parse.quote_plus(search)
 
-print(f"\nEXPORT ALL MY TICKETS"
-      f"\n**********************\n"
+print(f"\nEXPORT TICKETS WITH TAG"
+      f"\n************************\n"
       f"\n* SUBDOMAIN: {subdomain}"
       f"\n* USER: {user}"
       f"\n* TOKEN: {token}"
+      f"\n* TAG: {tag}"
       f"\n\n>>> Starting\n")
 
 # Create file, open it and add a text needed to have a valid JSON file
@@ -48,7 +54,7 @@ my_file = open(file_name, 'w+')
 my_file.write('{"tickets":[' + '\n')
 
 page = 0
-num_tickets_to_export = 0
+
 while url:
 
     r = session.get(url, auth=(user, token))
@@ -58,7 +64,7 @@ while url:
 
         json_data = r.json()
 
-        for ticket in json_data['tickets']:
+        for ticket in json_data['results']:
             my_file.write('{"ticket": ' + json.dumps(ticket) + "},\n")  # This structure will create a valid JSON file
 
         num_tickets_to_export = json_data['count']
