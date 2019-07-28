@@ -23,7 +23,7 @@ def letsWait(wait_seconds):
 
 
 subdomain = 'xxxxx'
-user = ' xxxxxx@xxx.xxx/token'
+username = ' xxxxxx@xxx.xxx/token'
 token = 'xxxxxxxxxxx'
 file_name = 'tickets.json'
 
@@ -38,7 +38,7 @@ url = 'https://' + subdomain + '.zendesk.com/api/v2/tickets.json'
 print(f"\nEXPORT ALL MY TICKETS"
       f"\n**********************\n"
       f"\n* SUBDOMAIN: {subdomain}"
-      f"\n* USER: {user}"
+      f"\n* USER: {username}"
       f"\n* TOKEN: {token}"
       f"\n\n>>> Starting\n")
 
@@ -51,7 +51,7 @@ page = 0
 num_tickets_to_export = 0
 while url:
 
-    r = session.get(url, auth=(user, token))
+    r = session.get(url, auth=(username, token))
 
     # HTTP 200 Range
     if str(r.status_code)[0] == '2':
