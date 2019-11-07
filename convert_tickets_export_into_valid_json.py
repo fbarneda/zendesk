@@ -2,6 +2,9 @@
 Convert JSON export (TICKETS) into a valid JSON file.
 For more info:
 https://support.zendesk.com/hc/en-us/articles/203662346-Exporting-data-to-a-JSON-CSV-or-XML-file-Professional-and-Enterprise-
+
+USAGE: You will need to have a file called 'tickets.json' in the same directory where you run this script.
+The script will generate a valid JSON file called 'export.json'.
 """
 
 
