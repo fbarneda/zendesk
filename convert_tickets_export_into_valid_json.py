@@ -1,5 +1,5 @@
 """
-Convert JSON export into a valid JSON file.
+Convert JSON export (TICKETS) into a valid JSON file.
 For more info:
 https://support.zendesk.com/hc/en-us/articles/203662346-Exporting-data-to-a-JSON-CSV-or-XML-file-Professional-and-Enterprise-
 """
